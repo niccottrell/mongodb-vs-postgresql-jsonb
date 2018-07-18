@@ -1,22 +1,25 @@
 import model.ExamplePg;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Component;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
 
 @Repository
-@Component
 public interface PgRepository extends JpaRepository<ExamplePg, Long> {
 
-  List<ExamplePg> findByFeature(String key);
+  @Query(nativeQuery = true, value = "SELECT * FROM example WHERE features->>?1 IS NOT NULL")
+  List<ExamplePg> findByFeatures(@Param("key") String key);
 
-  List<ExamplePg> findByFeature(String key, String value);
+  @Query(nativeQuery = true, value = "SELECT * FROM example WHERE features @> jsonb_build_object(:key, :val)")
+  List<ExamplePg> findByFeatures(@Param("key") String key, @Param("val") String value);
 
-  List<ExamplePg> findByAfter(Date minDate);
+  @Query(nativeQuery = true, value = "SELECT * FROM example WHERE (data->>'date') > :d")
+  List<ExamplePg> findByDateAfter(@Param("d") Date minDate);
 
-  List<ExamplePg> findByName(String name);
+  @Query(nativeQuery = true, value = "SELECT * FROM example WHERE (data->>'name') = :name")
+  List<ExamplePg> findByName(@Param("name") String name);
 
 }

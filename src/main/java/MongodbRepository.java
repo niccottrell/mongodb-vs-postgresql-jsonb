@@ -18,8 +18,8 @@ public interface MongodbRepository extends MongoRepository<ExampleMongo, String>
 
   List<ExampleMongo> findByName(String name);
 
-  @Query("{domain: { $regex: ?0 } }")
-  List<ExampleMongo> findByAfter(Date minDate);
+  @Query("{date: { $gt: ?0 } }")
+  List<ExampleMongo> findByDateAfter(Date minDate);
 
 }
 

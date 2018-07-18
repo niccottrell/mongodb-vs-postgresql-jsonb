@@ -5,7 +5,6 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -15,8 +14,7 @@ import java.util.Map;
 @TypeDef(name = "JsonDataUserType", typeClass = JsonDataUserType.class)
 @Table(name = "example",
         indexes = {
-                @Index(columnList = "name", unique = true),
-                @Index(columnList = "name"),
+                @Index(columnList = "id", unique = true),
                 @Index(columnList = "features"),
         }
 )
@@ -26,10 +24,11 @@ public class ExamplePg implements ExampleInterface {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
 
-  @Type(type = "JsonDataUserType")
+  @Type(type = "hibernate.JsonDataUserType")
   private Data data;
 
-  @Type(type = "JsonDataUserType")
+  @Column
+  @Type(type = "hibernate.JsonDataUserType")
   private Map<String, String> features = new HashMap<String, String>();
 
   public long getId() {
@@ -73,19 +72,19 @@ public class ExamplePg implements ExampleInterface {
   }
 
   public Date getDate() {
-    return data.date;
+    return data.getDate();
   }
 
   public void setDate(Date date) {
-    this.data.date = date;
+    this.data.setDate(date);
   }
 
   public boolean isCorrect() {
-    return data.correct;
+    return data.isCorrect();
   }
 
   public void setCorrect(boolean correct) {
-    this.data.correct = correct;
+    this.data.setCorrect(correct);
   }
 
   @Override
@@ -98,24 +97,4 @@ public class ExamplePg implements ExampleInterface {
     return this.features.get(key);
   }
 
-  private class Data {
-
-
-    @NotNull
-    String name;
-
-    String description;
-
-    int stock;
-
-    @Column(precision = 11, scale = 2)
-    float price;
-
-    @NotNull
-    private Date date;
-
-    private boolean correct;
-
-
-  }
 }

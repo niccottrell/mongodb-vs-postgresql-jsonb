@@ -1,21 +1,17 @@
-import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 import model.ExampleInterface;
 import model.ExampleMongo;
 import model.ExamplePg;
-import model.mongodb.SpringMongoConfig;
+import model.mongodb.DataConfig;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Service;
+import org.springframework.test.context.ContextConfiguration;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -23,12 +19,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static model.mongodb.SpringMongoConfig.DBNAME;
+import static model.mongodb.DataConfig.DBNAME;
 
 @SpringBootApplication
+@ContextConfiguration(classes = {DataConfig.class, PgRepository.class, MongodbRepository.class})
 public class Populate {
 
-  private static final Logger logger = LoggerFactory.getLogger(SpringMongoConfig.class);
+  private static final Logger logger = LoggerFactory.getLogger(DataConfig.class);
 
   @Autowired
   private PgRepository pgRepo;
