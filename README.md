@@ -106,3 +106,4 @@ Some interesting articles:
 * [About indexes as text](https://stackoverflow.com/questions/36075918/postgresql-index-on-json)
 * [Checking existence of a key](https://stackoverflow.com/questions/28921355/how-do-i-check-if-a-json-key-exists-in-postgres)
 * [Compares Posgresql JSON to JSONB data types](https://blog.2ndquadrant.com/processing-json/)
+* [When To Avoid JSONB In A PostgreSQL Schema](https://heapanalytics.com/blog/engineering/when-to-avoid-jsonb-in-a-postgresql-schema)
