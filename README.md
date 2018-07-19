@@ -98,4 +98,5 @@ Official docs:
 * [JSON Functions and Operators](https://www.postgresql.org/docs/9.5/static/functions-json.html)
 
 Some interesting articles:
-* https://blog.anayrat.info/en/2017/11/26/postgresql---jsonb-and-statistics/
+* [About index sizes](https://blog.2ndquadrant.com/jsonb-type-performance-postgresql-9-4/)
+* [About index statistics](https://blog.anayrat.info/en/2017/11/26/postgresql---jsonb-and-statistics/)
