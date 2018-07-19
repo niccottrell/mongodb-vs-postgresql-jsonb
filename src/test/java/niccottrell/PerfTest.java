@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
@@ -58,6 +59,14 @@ public class PerfTest {
   public void testPerfPg() {
     long startTime = System.currentTimeMillis();
     for (int idx = 1; idx <= LOOP_COUNT; idx++) {
+      // Query by stock
+      int minStock = idx * 20;
+      List<ExamplePg> byStockGreaterThan = pgRepo.findByStockGreaterThan(minStock);
+      Assert.assertNotNull(byStockGreaterThan);
+      Assert.assertFalse("No results for stock >" + minStock, byStockGreaterThan.isEmpty());
+      for (ExamplePg ex : byStockGreaterThan) {
+        Assert.assertTrue(ex.getStock() > minStock);
+      }
       // Query by name
       int id = idx * 5;
       String name = "Name " + id;
@@ -104,6 +113,14 @@ public class PerfTest {
   public void testPerfMongo() {
     long startTime = System.currentTimeMillis();
     for (int idx = 1; idx <= LOOP_COUNT; idx++) {
+      // Query by stock
+      int minStock = idx * 20;
+      List<ExampleMongo> byStockGreaterThan = mongoRep.findByStockGreaterThan(minStock, new PageRequest(0, 100));
+      Assert.assertNotNull(byStockGreaterThan);
+      Assert.assertFalse("No results for stock > " + idx, byStockGreaterThan.isEmpty());
+      for (ExampleMongo ex : byStockGreaterThan) {
+        Assert.assertTrue(ex.getStock() > minStock);
+      }
       // Query by name
       int id = idx * 5;
       String name = "Name " + id;

@@ -19,8 +19,15 @@ We generate 10k documents in both MongoDB and Postgresql using Spring Boot + JPA
 CREATE INDEX ON example USING BTREE ((data->>'stock'));
 CREATE INDEX ON example USING HASH ((data->>'stock'));
 CREATE INDEX ON example USING GIN ((data));
-CREATE INDEX ON example USING GIN ((data->>'stock'));
+CREATE INDEX ON example USING BTREE (cast (data->>'stock' as int));
 ```
+
+### Time taken
+
+Test| Time taken|
+------------- |:-------------:|
+testPerfMongo | 23.519s |
+testPerfPg | 54.798s |
 
 ### Example data
 

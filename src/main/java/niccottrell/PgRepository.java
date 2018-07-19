@@ -27,4 +27,7 @@ public interface PgRepository extends JpaRepository<ExamplePg, Long> {
   @Query(nativeQuery = true, value = "SELECT * FROM example WHERE (data->>'name') = :name")
   List<ExamplePg> findByName(@Param("name") String name);
 
+  @Query(nativeQuery = true, value = "SELECT * FROM example WHERE (cast (data->>'stock' as int)) > :d LIMIT 100")
+  List<ExamplePg> findByStockGreaterThan(@Param("d") int stock);
+
 }

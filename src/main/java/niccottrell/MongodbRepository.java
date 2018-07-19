@@ -1,6 +1,7 @@
 package niccottrell;
 
 import niccottrell.model.ExampleMongo;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -17,6 +18,8 @@ public interface MongodbRepository extends MongoRepository<ExampleMongo, String>
 
   @Query("{date: { $gt: ?0 } }")
   List<ExampleMongo> findByDateAfter(Date minDate);
+
+  List<ExampleMongo> findByStockGreaterThan(int minStock, Pageable pageable);
 
 }
 
