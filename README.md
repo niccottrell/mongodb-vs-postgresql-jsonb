@@ -95,10 +95,14 @@ Some code forked from https://www.vojtechruzicka.com/postgresqls-jsonb-type-mapp
 Official docs:
 * [Spring Data MongoDB](https://docs.spring.io/spring-data/mongodb/docs/current/reference/html/)
 * Details on Postgres's [GIN Indexes](https://www.postgresql.org/docs/current/static/gin.html)
+* [JSON Types](https://www.postgresql.org/docs/current/static/datatype-json.html)
 * [JSON Functions and Operators](https://www.postgresql.org/docs/9.5/static/functions-json.html)
+* [GiST and GIN Index Types](https://www.postgresql.org/docs/9.1/static/textsearch-indexes.html)
 
 Some interesting articles:
 * [About GIN internals](http://bitnine.net/blog-postgresql/postgresql-internals-jsonb-type-and-its-indexes/)
 * [About index sizes](https://blog.2ndquadrant.com/jsonb-type-performance-postgresql-9-4/)
 * [About index statistics](https://blog.anayrat.info/en/2017/11/26/postgresql---jsonb-and-statistics/)
 * [About indexes as text](https://stackoverflow.com/questions/36075918/postgresql-index-on-json)
+* [Checking existence of a key](https://stackoverflow.com/questions/28921355/how-do-i-check-if-a-json-key-exists-in-postgres)
+* [Compares Posgresql JSON to JSONB data types](https://blog.2ndquadrant.com/processing-json/)
