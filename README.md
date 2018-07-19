@@ -98,5 +98,7 @@ Official docs:
 * [JSON Functions and Operators](https://www.postgresql.org/docs/9.5/static/functions-json.html)
 
 Some interesting articles:
+* [About GIN internals](http://bitnine.net/blog-postgresql/postgresql-internals-jsonb-type-and-its-indexes/)
 * [About index sizes](https://blog.2ndquadrant.com/jsonb-type-performance-postgresql-9-4/)
 * [About index statistics](https://blog.anayrat.info/en/2017/11/26/postgresql---jsonb-and-statistics/)
+* [About indexes as text](https://stackoverflow.com/questions/36075918/postgresql-index-on-json)
