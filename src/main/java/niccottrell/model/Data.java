@@ -1,4 +1,4 @@
-package model;
+package niccottrell.model;
 
 import javax.persistence.Column;
 import javax.validation.constraints.NotNull;

@@ -1,4 +1,4 @@
-package model;
+package niccottrell.model;
 
 import java.util.Date;
 
@@ -35,4 +35,5 @@ public interface ExampleInterface {
   void addFeature(String key, String value);
 
   String getFeature(String key);
+
 }

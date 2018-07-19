@@ -1,4 +1,4 @@
-package hibernate;
+package niccottrell.hibernate;
 
 import org.hibernate.dialect.PostgreSQL94Dialect;
 

@@ -1,4 +1,4 @@
-package hibernate;
+package niccottrell.hibernate;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -7,6 +7,8 @@ import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.type.SerializationException;
 import org.hibernate.usertype.UserType;
 import org.postgresql.util.PGobject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.ObjectUtils;
 
 import java.io.Serializable;
@@ -15,37 +17,25 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.HashMap;
-import java.util.Map;
 
 public abstract class JsonUserType implements UserType {
+
+  private static final Logger logger = LoggerFactory.getLogger(JsonUserType.class);
 
   public static final String JSONB_TYPE = "jsonb";
 
   private final Gson gson = new GsonBuilder().serializeNulls().create();
 
-  @Override
-  public Object deepCopy(Object originalValue) throws HibernateException {
-    if (originalValue == null) {
-      return null;
-    }
-
-    if (!(originalValue instanceof Map)) {
-      return null;
-    }
-
-    Map resultMap = new HashMap<>();
-
-    Map<?, ?> tempMap = (Map<?, ?>) originalValue;
-    tempMap.forEach((key, value) -> resultMap.put((String) key, (String) value));
-
-    return resultMap;
-  }
-
+  @SuppressWarnings("unchecked")
   @Override
   public Object nullSafeGet(ResultSet rs, String[] names, SharedSessionContractImplementor session, Object owner) throws HibernateException, SQLException {
     PGobject o = (PGobject) rs.getObject(names[0]);
+    if (o == null) {
+      logger.warn("No object for name=" + names[0]);
+      return null;
+    }
     if (o.getValue() != null) {
-      return gson.fromJson(o.getValue(), Map.class);
+      return gson.fromJson(o.getValue(), returnedClass());
     }
 
     return new HashMap();
@@ -56,7 +46,7 @@ public abstract class JsonUserType implements UserType {
     if (value == null) {
       st.setNull(index, Types.OTHER);
     } else {
-      st.setObject(index, gson.toJson(value, Map.class), Types.OTHER);
+      st.setObject(index, gson.toJson(value, returnedClass()), Types.OTHER);
     }
   }
 

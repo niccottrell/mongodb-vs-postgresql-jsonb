@@ -1,4 +1,4 @@
-package model.mongodb;
+package niccottrell.model.mongodb;
 
 import com.mongodb.MongoClient;
 import org.postgresql.ds.PGSimpleDataSource;
@@ -6,10 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
@@ -17,13 +15,14 @@ import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 @Configuration
-public class DataConfig extends AbstractMongoConfiguration {
+public class MongoConfig extends AbstractMongoConfiguration {
 
-  private static final Logger logger = LoggerFactory.getLogger(DataConfig.class);
+  private static final Logger logger = LoggerFactory.getLogger(MongoConfig.class);
 
   public static final String DBNAME = "PgPerf";
+  public static final String COLLNAME = "example";
 
-  public DataConfig() {
+  public MongoConfig() {
     logger.info("Built Mongo config");
   }
 
@@ -57,7 +56,7 @@ public class DataConfig extends AbstractMongoConfiguration {
     vendorAdapter.setGenerateDdl(true);
     LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
     factory.setJpaVendorAdapter(vendorAdapter);
-    factory.setPackagesToScan("model");
+    factory.setPackagesToScan("niccottrell/model");
     factory.setDataSource(dataSource());
     factory.setPersistenceUnitName("postgres");
     factory.afterPropertiesSet();

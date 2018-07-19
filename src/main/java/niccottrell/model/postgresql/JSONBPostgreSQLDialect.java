@@ -1,6 +1,6 @@
-package model.postgresql;
+package niccottrell.model.postgresql;
 
-import hibernate.JsonDataUserType;
+import niccottrell.hibernate.JsonDataUserType;
 import org.hibernate.dialect.PostgreSQL94Dialect;
 
 import java.sql.Types;

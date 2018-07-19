@@ -1,8 +1,7 @@
-package model;
+package niccottrell.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -10,7 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-@Document(collection="examples")
+@Document(collection="example")
 public class ExampleMongo implements ExampleInterface {
 
   @Id
@@ -96,6 +95,20 @@ public class ExampleMongo implements ExampleInterface {
   @Override
   public String getFeature(String key) {
  return   this.features.get(key);
+  }
+
+  @Override
+  public String toString() {
+    return "ExampleMongo{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", description='" + description + '\'' +
+            ", stock=" + stock +
+            ", price=" + price +
+            ", date=" + date +
+            ", correct=" + correct +
+            ", features=" + features +
+            '}';
   }
 }
 

@@ -1,34 +1,38 @@
-package model;
+package niccottrell.model;
 
-import hibernate.JsonDataUserType;
+import com.querydsl.core.annotations.QueryEntity;
+import niccottrell.hibernate.JsonDataUserType;
+import niccottrell.hibernate.JsonMapUserType;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 @Entity
 @TypeDef(name = "JsonDataUserType", typeClass = JsonDataUserType.class)
+@TypeDef(name = "JsonMapUserType", typeClass = JsonMapUserType.class)
 @Table(name = "example",
         indexes = {
                 @Index(columnList = "id", unique = true),
                 @Index(columnList = "features"),
         }
 )
+@QueryEntity
 public class ExamplePg implements ExampleInterface {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  // @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
 
-  @Type(type = "hibernate.JsonDataUserType")
-  private Data data;
+  @Column
+  @Type(type = "JsonDataUserType")
+  private Data data = new Data();
 
   @Column
-  @Type(type = "hibernate.JsonDataUserType")
+  @Type(type = "JsonMapUserType")
   private Map<String, String> features = new HashMap<String, String>();
 
   public long getId() {
@@ -97,4 +101,12 @@ public class ExamplePg implements ExampleInterface {
     return this.features.get(key);
   }
 
+  @Override
+  public String toString() {
+    return "ExamplePg{" +
+            "id=" + id +
+            ", data=" + data +
+            ", features=" + features +
+            '}';
+  }
 }
