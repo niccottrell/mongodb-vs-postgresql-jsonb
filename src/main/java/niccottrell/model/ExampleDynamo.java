@@ -17,8 +17,6 @@ public class ExampleDynamo implements ExampleInterface<Integer> {
 
   public static final String KEY_ID = "id";
 
-  public static final String KEY_NAME = "name";
-
   private Integer id;
 
   @NotNull

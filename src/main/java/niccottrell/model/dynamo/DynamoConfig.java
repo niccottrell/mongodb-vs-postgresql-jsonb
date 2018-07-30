@@ -8,6 +8,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.dynamodbv2.document.Index;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.local.server.DynamoDBProxyServer;
 import com.amazonaws.services.dynamodbv2.local.server.LocalDynamoDBRequestHandler;
@@ -110,11 +111,8 @@ public class DynamoConfig {
             new KeySchemaElement("stock", KeyType.RANGE)); // sort key
     List<AttributeDefinition> attribute = Arrays.asList(
             new AttributeDefinition(ExampleDynamo.KEY_ID, ScalarAttributeType.N), // number
-            new AttributeDefinition("stock", ScalarAttributeType.N), // number
-            new AttributeDefinition("price", ScalarAttributeType.N), // number
-            new AttributeDefinition("name", ScalarAttributeType.S), // string
-            new AttributeDefinition("description", ScalarAttributeType.S) // string
-            );
+            new AttributeDefinition("stock", ScalarAttributeType.N) // number
+    );
     ProvisionedThroughput provisionedThroughput = new ProvisionedThroughput(10L, 10L);
     Table table = dynamoDB.createTable(TABLE_NAME,
             keySchema,
@@ -127,58 +125,67 @@ public class DynamoConfig {
 
   public static void createDynamoIndexes() {
     logger.info("Attempting to create global secondary indexes; please wait...");
-    AmazonDynamoDB client = getDynamoClient();
 
     ProjectionType projectionType = ProjectionType.ALL; // since we want to load the whole object
+    ProvisionedThroughput provisionedThroughput = new ProvisionedThroughput(20L, 20L);
 
     // StockIndex
-    GlobalSecondaryIndexUpdate stockIndex = new GlobalSecondaryIndexUpdate()
-            .withCreate(new CreateGlobalSecondaryIndexAction()
-                    .withIndexName("StockIndex")
-                    .withKeySchema(
-                            new KeySchemaElement().withAttributeName("stock").withKeyType(KeyType.HASH), // Partition key
-                            new KeySchemaElement().withAttributeName("date").withKeyType(KeyType.RANGE)) // Compound key?
-                    .withProvisionedThroughput(new ProvisionedThroughput(20L,20L))
-                    .withProjection(new Projection().withProjectionType(projectionType)));
+    CreateGlobalSecondaryIndexAction stockIndex = new CreateGlobalSecondaryIndexAction()
+            .withIndexName("StockIndex")
+            .withKeySchema(
+                    new KeySchemaElement().withAttributeName("stock").withKeyType(KeyType.HASH), // Partition key
+                    new KeySchemaElement().withAttributeName("date").withKeyType(KeyType.RANGE)) // Sort key
+            .withProvisionedThroughput(provisionedThroughput)
+            .withProjection(new Projection().withProjectionType(ProjectionType.ALL));
+    addGSI(stockIndex, new AttributeDefinition("stock", ScalarAttributeType.N), new AttributeDefinition("date", ScalarAttributeType.S));
 
     // NameIndex
-    GlobalSecondaryIndexUpdate nameIndex = new GlobalSecondaryIndexUpdate()
-            .withCreate(new CreateGlobalSecondaryIndexAction()
-                    .withIndexName("NameIndex")
-                    .withKeySchema(new KeySchemaElement().withAttributeName(ExampleDynamo.KEY_NAME).withKeyType(KeyType.RANGE)) // Partition key
-                    .withProjection(new Projection().withProjectionType(projectionType)));
+    CreateGlobalSecondaryIndexAction nameIndex = new CreateGlobalSecondaryIndexAction()
+            .withIndexName("NameIndex")
+            .withKeySchema(new KeySchemaElement().withAttributeName("name").withKeyType(KeyType.HASH)) // Partition key
+            .withProvisionedThroughput(provisionedThroughput)
+            .withProjection(new Projection().withProjectionType(projectionType));
+    addGSI(nameIndex, new AttributeDefinition("name", ScalarAttributeType.S));
 
     // DateIndex
-    GlobalSecondaryIndexUpdate dateIndex = new GlobalSecondaryIndexUpdate()
-            .withCreate(new CreateGlobalSecondaryIndexAction()
-                    .withIndexName("DateIndex")
-                    .withKeySchema(new KeySchemaElement().withAttributeName("date").withKeyType(KeyType.RANGE)) // Partition key
-                    .withProjection(new Projection().withProjectionType(projectionType)));
+    CreateGlobalSecondaryIndexAction dateIndex = new CreateGlobalSecondaryIndexAction()
+            .withIndexName("DateIndex")
+            .withKeySchema(new KeySchemaElement().withAttributeName("date").withKeyType(KeyType.HASH)) // Partition key
+            .withProvisionedThroughput(provisionedThroughput)
+            .withProjection(new Projection().withProjectionType(projectionType));
+    addGSI(dateIndex, new AttributeDefinition("date", ScalarAttributeType.S));
 
     // FeaturesIndex (TODO: Can this be used?)
-    GlobalSecondaryIndexUpdate featuresIndex = new GlobalSecondaryIndexUpdate()
-            .withCreate(new CreateGlobalSecondaryIndexAction()
-                    .withIndexName("FeaturesIndex")
-                    .withKeySchema(new KeySchemaElement().withAttributeName("features").withKeyType(KeyType.HASH)) // Partition key
-                    .withProjection(new Projection().withProjectionType(projectionType)));
-
-    List<GlobalSecondaryIndexUpdate> indexUpdates = Arrays.asList(
-            stockIndex, nameIndex, dateIndex, featuresIndex);
-
-    for (GlobalSecondaryIndexUpdate indexUpdate : indexUpdates) {
-      try {
-        UpdateTableRequest updateTableRequest = new UpdateTableRequest()
-                .withTableName(TABLE_NAME)
-                .withGlobalSecondaryIndexUpdates(indexUpdate); // even though this accepts multiple, it gives "Only 1 online index can be created or deleted simultaneously per table (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: LimitExceededException; Request ID: ..."
-        UpdateTableResult updateTableResult = client.updateTable(updateTableRequest);
-        logger.info("New table description: " + updateTableResult.getTableDescription());
-      } catch (Exception e) {
-        throw new RuntimeException("Error creating index: " + indexUpdate.getCreate().getIndexName(), e);
-      }
-    }
+    CreateGlobalSecondaryIndexAction featuresIndex = new CreateGlobalSecondaryIndexAction()
+            .withIndexName("FeaturesIndex")
+            .withKeySchema(new KeySchemaElement().withAttributeName("features").withKeyType(KeyType.HASH)) // Partition key
+            .withProvisionedThroughput(provisionedThroughput)
+            .withProjection(new Projection().withProjectionType(projectionType));
+    addGSI(featuresIndex, new AttributeDefinition("features", ScalarAttributeType.S));
 
     logger.info("Created secondary indexes");
 
+  }
+
+  private static void addGSI(CreateGlobalSecondaryIndexAction create, AttributeDefinition partitionField) {
+    addGSI(create, partitionField, null);
+  }
+
+  private static void addGSI(CreateGlobalSecondaryIndexAction create, AttributeDefinition partitionField, AttributeDefinition sortField) {
+    if (partitionField == null) throw new RuntimeException("No attributes provided!");
+    AmazonDynamoDB client = getDynamoClient();
+    try {
+      Index index;
+      DynamoDB dynamoDB = new DynamoDB(client);
+      if (sortField == null) {
+        index = dynamoDB.getTable(TABLE_NAME).createGSI(create, partitionField);
+      } else {
+        index = dynamoDB.getTable(TABLE_NAME).createGSI(create, partitionField, sortField);
+      }
+      index.waitForActive();
+    } catch (Exception e) {
+      throw new RuntimeException("Error creating index: " + create.getIndexName(), e);
+    }
   }
 
   public static List<ExampleDynamo> findByStockGreaterThan(DynamoDBMapper mapper, int minStock) {
