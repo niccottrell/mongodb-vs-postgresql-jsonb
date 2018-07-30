@@ -8,8 +8,17 @@ We generate 10k documents in both MongoDB and Postgresql using Spring Boot + JPA
 
 1. Install local Postgres (with database "postgres")
 1. Install local MongoDB (with database "PgPerf")
+1. Install [DynamoDB Local](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html#DynamoDBLocal.DownloadingAndRunning) 
 1. Run `mvn compile` to build QueryDSL sources
 1. Run `mvn test` to run performance tests
+
+### sql4lite dependencies for Mac
+
+```bash
+wget https://d1.almworks.com/.files/sqlite4java/sqlite4java-392.zip
+unzip sqlite4java-392.zip
+sudo cp sqlite4java-392/*.dylib /Library/Java/Extensions/
+```
 
 ## Results
 
@@ -99,7 +108,7 @@ Official docs:
 * [JSON Functions and Operators](https://www.postgresql.org/docs/9.5/static/functions-json.html)
 * [GiST and GIN Index Types](https://www.postgresql.org/docs/9.1/static/textsearch-indexes.html)
 
-Some interesting articles:
+Postgresql articles:
 * [About GIN internals](http://bitnine.net/blog-postgresql/postgresql-internals-jsonb-type-and-its-indexes/)
 * [About index sizes](https://blog.2ndquadrant.com/jsonb-type-performance-postgresql-9-4/)
 * [About index statistics](https://blog.anayrat.info/en/2017/11/26/postgresql---jsonb-and-statistics/)
@@ -107,3 +116,6 @@ Some interesting articles:
 * [Checking existence of a key](https://stackoverflow.com/questions/28921355/how-do-i-check-if-a-json-key-exists-in-postgres)
 * [Compares Posgresql JSON to JSONB data types](https://blog.2ndquadrant.com/processing-json/)
 * [When To Avoid JSONB In A PostgreSQL Schema](https://heapanalytics.com/blog/engineering/when-to-avoid-jsonb-in-a-postgresql-schema)
+
+DynamoDB articles:
+* [General Guidelines for Secondary Indexes in DynamoDB](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-indexes-general.html)

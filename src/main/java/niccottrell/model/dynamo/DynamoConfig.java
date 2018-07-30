@@ -28,7 +28,7 @@ public class DynamoConfig {
 
   private static DynamoDBProxyServer localDb;
 
-  private static Integer localDbPort = null; // 8000;
+  private static Integer localDbPort = 8000;
 
   public static AmazonDynamoDB getDynamoClient() {
     if (localDbPort != null) {
@@ -79,7 +79,7 @@ public class DynamoConfig {
     }
     try {
       // recreate an empty table
-      // createTable(dynamoDB);
+      createTable(dynamoDB);
       // test that table is loadable
       Table table = dynamoDB.getTable(TABLE_NAME);
       logger.info("Table description=" + table.getDescription());
@@ -106,9 +106,15 @@ public class DynamoConfig {
     // create table
     List<KeySchemaElement> keySchema = Arrays.asList(
             // Partition key
-            new KeySchemaElement(ExampleDynamo.KEY_ID, KeyType.HASH));
+            new KeySchemaElement(ExampleDynamo.KEY_ID, KeyType.HASH), // partition key
+            new KeySchemaElement("stock", KeyType.RANGE)); // sort key
     List<AttributeDefinition> attribute = Arrays.asList(
-            new AttributeDefinition(ExampleDynamo.KEY_ID, ScalarAttributeType.N)); // number
+            new AttributeDefinition(ExampleDynamo.KEY_ID, ScalarAttributeType.N), // number
+            new AttributeDefinition("stock", ScalarAttributeType.N), // number
+            new AttributeDefinition("price", ScalarAttributeType.N), // number
+            new AttributeDefinition("name", ScalarAttributeType.S), // string
+            new AttributeDefinition("description", ScalarAttributeType.S) // string
+            );
     ProvisionedThroughput provisionedThroughput = new ProvisionedThroughput(10L, 10L);
     Table table = dynamoDB.createTable(TABLE_NAME,
             keySchema,
@@ -130,8 +136,9 @@ public class DynamoConfig {
             .withCreate(new CreateGlobalSecondaryIndexAction()
                     .withIndexName("StockIndex")
                     .withKeySchema(
-                            new KeySchemaElement().withAttributeName("stock").withKeyType(KeyType.HASH)) // Partition key
-                            // new KeySchemaElement().withAttributeName("date").withKeyType(KeyType.RANGE)) // Compound key?
+                            new KeySchemaElement().withAttributeName("stock").withKeyType(KeyType.HASH), // Partition key
+                            new KeySchemaElement().withAttributeName("date").withKeyType(KeyType.RANGE)) // Compound key?
+                    .withProvisionedThroughput(new ProvisionedThroughput(20L,20L))
                     .withProjection(new Projection().withProjectionType(projectionType)));
 
     // NameIndex

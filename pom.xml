@@ -18,6 +18,15 @@
         <querydsl.version>4.1.4</querydsl.version>
     </properties>
 
+    <!--Custom repository:-->
+    <repositories>
+        <repository>
+            <id>dynamodb-local-oregon</id>
+            <name>DynamoDB Local Release Repository</name>
+            <url>https://s3-us-west-2.amazonaws.com/dynamodb-local/release</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>javax.validation</groupId>
@@ -71,7 +80,18 @@
             <artifactId>querydsl-apt</artifactId>
             <version>${querydsl.version}</version>
         </dependency>
-
+        <!-- AWS DynamoDB Local dependencies -->
+        <!--Dependency:-->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+                <artifactId>DynamoDBLocal</artifactId>
+            <version>[1.11,2.0)</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-dynamodb</artifactId>
+            <version>1.11.375</version>
+        </dependency>
         <!-- Logging -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
@@ -128,7 +148,8 @@
                         </goals>
                         <configuration>
                             <outputDirectory>target/generated-sources/queries</outputDirectory>
-                            <processor>org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor</processor>
+                            <processor>org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor
+                            </processor>
                         </configuration>
                     </execution>
                 </executions>
