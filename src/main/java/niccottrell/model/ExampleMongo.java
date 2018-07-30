@@ -10,10 +10,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Document(collection="example")
-public class ExampleMongo implements ExampleInterface {
+public class ExampleMongo implements ExampleInterface<Long> {
 
   @Id
-  private long id;
+  private Long id;
 
   @NotNull
   String name;
@@ -47,11 +47,11 @@ public class ExampleMongo implements ExampleInterface {
     this.date = date;
   }
 
-  public long getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(long id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

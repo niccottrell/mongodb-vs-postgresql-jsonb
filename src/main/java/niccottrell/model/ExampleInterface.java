@@ -2,13 +2,13 @@ package niccottrell.model;
 
 import java.util.Date;
 
-public interface ExampleInterface {
+public interface ExampleInterface<K> {
 
   void setDate(Date date);
 
-  long getId();
+  K getId();
 
-  void setId(long id);
+  void setId(K id);
 
   String getName();
 

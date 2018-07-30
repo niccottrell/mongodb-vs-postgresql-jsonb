@@ -21,7 +21,7 @@ import java.util.Map;
         }
 )
 @QueryEntity
-public class ExamplePg implements ExampleInterface {
+public class ExamplePg implements ExampleInterface<Long> {
 
   @Id
   // @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,11 +35,11 @@ public class ExamplePg implements ExampleInterface {
   @Type(type = "JsonMapUserType")
   private Map<String, String> features = new HashMap<String, String>();
 
-  public long getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(long id) {
+  public void setId(Long id) {
     this.id = id;
   }
 

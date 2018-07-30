@@ -1,10 +1,14 @@
 package niccottrell;
 
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
+import niccottrell.model.ExampleDynamo;
 import niccottrell.model.ExampleInterface;
 import niccottrell.model.ExampleMongo;
 import niccottrell.model.ExamplePg;
+import niccottrell.model.dynamo.DynamoConfig;
 import niccottrell.model.mongodb.MongoConfig;
 import niccottrell.model.postgresql.PgConfig;
 import org.bson.Document;
@@ -21,6 +25,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -52,6 +57,7 @@ public class Populate {
   protected void createIndexes() throws Exception {
     createMongoIndexes(mongoClient);
     createPgIndexes();
+    DynamoConfig.createDynamoIndexes();
   }
 
   protected static void createPgIndexes() throws SQLException {
@@ -84,6 +90,7 @@ public class Populate {
     logger.info("Dropping test data");
     mongoRep.deleteAll();
     pgRepo.deleteAll();
+    DynamoConfig.cleanup();
     logger.info("Building fresh test data");
     List<ExampleMongo> exsMongo = createData(ExampleMongo.class);
     long startTime = System.currentTimeMillis();
@@ -93,14 +100,29 @@ public class Populate {
     startTime = System.currentTimeMillis();
     pgRepo.saveAll(exsPg);
     logger.info("Save to Pg took " + (System.currentTimeMillis() - startTime) + " ms");
+    List<ExampleDynamo> exsDynamo = createData(ExampleDynamo.class);
+    startTime = System.currentTimeMillis();
+    saveAll(DynamoConfig.getDynamoClient(), exsDynamo);
+    logger.info("Save to DynamoDB took " + (System.currentTimeMillis() - startTime) + " ms");
   }
 
-  private static <K extends ExampleInterface> List<K> createData(Class<K> cls) throws Exception {
+  protected static void saveAll(AmazonDynamoDB client, Collection<ExampleDynamo> examples) {
+    DynamoDBMapper mapper = new DynamoDBMapper(client);
+    ArrayList<Object> objectsToDelete = new ArrayList<>(); // delete nothing
+    List<DynamoDBMapper.FailedBatch> batchWrite = mapper.batchWrite(examples, objectsToDelete);
+    if (batchWrite.size() > 0) {
+      logger.error("Failed to add {} examples to DynamoDB", batchWrite.size());
+    } else {
+      logger.info("Added {} examples to DynamoDB", examples.size());
+    }
+  }
+
+  protected static <K extends ExampleInterface> List<K> createData(Class<K> cls) throws Exception {
     List<K> results = new ArrayList<K>();
     for (int i = 1; i < 10000; i++) {
       K ex = cls.getDeclaredConstructor().newInstance();
       populate(ex, i);
-      if (ex.getId() == 0) throw new RuntimeException("No id set: " + ex);
+      if (ex.getId() == null) throw new RuntimeException("No id set: " + ex);
       if (ex.getDescription() == null) throw new RuntimeException("No description set: " + ex);
       if (ex.getDate() == null) throw new RuntimeException("No date set: " + ex);
       results.add(ex);
